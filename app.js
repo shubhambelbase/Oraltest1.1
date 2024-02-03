@@ -21,7 +21,7 @@ function startOralTest() {
             currentIndex = 0;
             spokenWords.clear();
             randomizedWords = generateRandomOrder(wordsForTest);
-            
+
             // Save randomizedWords to local storage
             localStorage.setItem('randomizedWords', JSON.stringify(randomizedWords));
         }
@@ -32,7 +32,10 @@ function startOralTest() {
 
         const currentWord = randomizedWords[currentIndex];
         const utterance = new SpeechSynthesisUtterance(currentWord);
-        utterance.lang = 'en-US';
+
+        // Check if Nepali language synthesis is supported, otherwise use English
+        const nepaliLang = isNepaliSynthesisSupported() ? 'ne-NP' : 'en-US';
+        utterance.lang = nepaliLang;
 
         currentUtterance = utterance;
 
@@ -44,7 +47,7 @@ function startOralTest() {
 
         startButton.disabled = true;
 
-        utterance.onend = function() {
+        utterance.onend = function () {
             if (currentIndex < randomizedWords.length) {
                 startButton.disabled = false;
             } else {
@@ -61,7 +64,7 @@ function repeatWord() {
         speechSynthesis.cancel();
 
         const utterance = new SpeechSynthesisUtterance(randomizedWords[currentIndex - 1]);
-        utterance.lang = 'en-US';
+        utterance.lang = isNepaliSynthesisSupported() ? 'ne-NP' : 'en-US';
 
         speechSynthesis.speak(utterance);
     }
@@ -81,7 +84,10 @@ function resetOralTest() {
 
     const currentWord = randomizedWords[currentIndex];
     const utterance = new SpeechSynthesisUtterance(currentWord);
-    utterance.lang = 'en-US';
+
+    // Check if Nepali language synthesis is supported, otherwise use English
+    const nepaliLang = isNepaliSynthesisSupported() ? 'ne-NP' : 'en-US';
+    utterance.lang = nepaliLang;
 
     currentUtterance = utterance;
 
@@ -93,7 +99,7 @@ function resetOralTest() {
 
     startButton.disabled = true;
 
-    utterance.onend = function() {
+    utterance.onend = function () {
         if (currentIndex < randomizedWords.length) {
             startButton.disabled = false;
         } else {
@@ -127,8 +133,13 @@ function shuffleArray(array) {
     }
 }
 
+// Function to check if Nepali synthesis is supported
+function isNepaliSynthesisSupported() {
+    return speechSynthesis.getVoices().some(voice => voice.lang === 'ne-NP');
+}
+
 // Function to get words from local storage
 function getWordsFromLocalStorage() {
     const storedWords = localStorage.getItem('randomizedWords');
     return storedWords ? JSON.parse(storedWords) : [];
-    }
+                      }
