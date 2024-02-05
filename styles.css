@@ -6,6 +6,8 @@ body {
   justify-content: center;
   height: 100vh;
   margin: 0;
+  opacity: 0;
+  animation: fadeIn 1s ease-in-out forwards;
 }
 
 .container {
@@ -14,6 +16,7 @@ body {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  animation: fadeInContainer 1s ease-in-out forwards;
 }
 
 textarea {
@@ -57,7 +60,95 @@ button:hover {
   filter: brightness(90%);
 }
 
+#guideButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+
 #displayedWord {
   margin-top: 20px;
   font-size: 24px;
+}
+
+/* Add these styles for the progress bar */
+.progress-container {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.progress-bar {
+  height: 20px;
+  background-color: #007bff;
+  width: 0;
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+
+/* Add this style for the "Clear Words" button in the guide modal */
+#clearButton {
+    background-color: #dc3545; /* Red background color */
+    color: #fff; /* White text color */
+    padding: 10px 20px; /* Adjust padding as needed */
+    font-size: 16px; /* Adjust font size as needed */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#clearButton:hover {
+    background-color: #bd2130; /* Darker red on hover */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInContainer {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
