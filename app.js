@@ -3,16 +3,60 @@ let randomizedWords = [];
 let currentIndex = 0;
 let spokenWords = new Set();
 let currentUtterance = null;
+let progressBar = document.getElementById('progressBar');
+let progressValue = 0;
 
-// Load words from local storage on page load
-window.onload = function () {
-    randomizedWords = getWordsFromLocalStorage();
-};
+document.body.style.opacity = 1;
+document.body.style.animation = 'fadeIn 1s ease-in-out forwards';
+
+function showGuide() {
+    const guideModal = document.getElementById('guideModal');
+    guideModal.style.display = 'block';
+}
+
+function closeGuideModal() {
+    const guideModal = document.getElementById('guideModal');
+    guideModal.style.display = 'none';
+}
+
+window.onclick = function(event) {
+    const guideModal = document.getElementById('guideModal');
+    if (event.target === guideModal) {
+        guideModal.style.display = 'none';
+    }
+}
+
+function clearWords() {
+    const wordInput = document.getElementById('wordInput');
+    wordInput.value = '';
+
+    currentIndex = 0;
+    spokenWords.clear();
+    randomizedWords = [];
+
+    if (currentUtterance) {
+        speechSynthesis.cancel();
+    }
+
+    const displayedWordElement = document.getElementById('displayedWord');
+    displayedWordElement.textContent = '';
+
+    const displayedWordContainer = document.getElementById('displayedWordContainer');
+    displayedWordContainer.style.display = 'none';
+
+    const startButton = document.getElementById('startButton');
+    startButton.disabled = false;
+
+    // Reset progress bar
+    progressValue = 0;
+    progressBar.style.width = '0%';
+}
 
 function startOralTest() {
     const wordInput = document.getElementById('wordInput');
     const startButton = document.getElementById('startButton');
     const displayedWordElement = document.getElementById('displayedWord');
+    const displayedWordContainer = document.getElementById('displayedWordContainer');
 
     wordsForTest = wordInput.value.trim().split(/\s+/);
 
@@ -21,9 +65,6 @@ function startOralTest() {
             currentIndex = 0;
             spokenWords.clear();
             randomizedWords = generateRandomOrder(wordsForTest);
-
-            // Save randomizedWords to local storage
-            localStorage.setItem('randomizedWords', JSON.stringify(randomizedWords));
         }
 
         if (currentUtterance) {
@@ -32,20 +73,27 @@ function startOralTest() {
 
         const currentWord = randomizedWords[currentIndex];
         const utterance = new SpeechSynthesisUtterance(currentWord);
-
-        // Check if Nepali language synthesis is supported, otherwise use English
-        const nepaliLang = isNepaliSynthesisSupported() ? 'ne-NP' : 'en-US';
-        utterance.lang = nepaliLang;
+        utterance.lang = 'ne-NP';
 
         currentUtterance = utterance;
 
         speechSynthesis.speak(utterance);
 
         displayedWordElement.textContent = currentWord;
+        displayedWordContainer.style.display = document.getElementById('displayCheckbox').checked ? 'block' : 'none';
         spokenWords.add(currentWord);
         currentIndex++;
 
         startButton.disabled = true;
+
+        const progressInterval = setInterval(function() {
+            if (progressValue < 100) {
+                progressValue += 1;
+                progressBar.style.width = progressValue + '%';
+            } else {
+                clearInterval(progressInterval);
+            }
+        }, 100);
 
         utterance.onend = function () {
             if (currentIndex < randomizedWords.length) {
@@ -53,6 +101,9 @@ function startOralTest() {
             } else {
                 alert('Oral test completed. Every word has been spoken.');
             }
+            clearInterval(progressInterval);
+            progressValue = 0;
+            progressBar.style.width = '0%';
         };
     } else {
         alert('Please enter words for the test.');
@@ -64,7 +115,7 @@ function repeatWord() {
         speechSynthesis.cancel();
 
         const utterance = new SpeechSynthesisUtterance(randomizedWords[currentIndex - 1]);
-        utterance.lang = isNepaliSynthesisSupported() ? 'ne-NP' : 'en-US';
+        utterance.lang = 'ne-NP';
 
         speechSynthesis.speak(utterance);
     }
@@ -73,6 +124,7 @@ function repeatWord() {
 function resetOralTest() {
     const startButton = document.getElementById('startButton');
     const displayedWordElement = document.getElementById('displayedWord');
+    const displayedWordContainer = document.getElementById('displayedWordContainer');
 
     currentIndex = 0;
     spokenWords.clear();
@@ -84,16 +136,14 @@ function resetOralTest() {
 
     const currentWord = randomizedWords[currentIndex];
     const utterance = new SpeechSynthesisUtterance(currentWord);
-
-    // Check if Nepali language synthesis is supported, otherwise use English
-    const nepaliLang = isNepaliSynthesisSupported() ? 'ne-NP' : 'en-US';
-    utterance.lang = nepaliLang;
+    utterance.lang = 'ne-NP';
 
     currentUtterance = utterance;
 
     speechSynthesis.speak(utterance);
 
     displayedWordElement.textContent = currentWord;
+    displayedWordContainer.style.display = document.getElementById('displayCheckbox').checked ? 'block' : 'none';
     spokenWords.add(currentWord);
     currentIndex++;
 
@@ -119,6 +169,13 @@ function stopSpeech() {
     }
 }
 
+function updateDisplayWordVisibility() {
+    const displayedWordContainer = document.getElementById('displayedWordContainer');
+    displayedWordContainer.style.display = document.getElementById('displayCheckbox').checked ? 'block' : 'none';
+}
+
+document.getElementById('displayCheckbox').addEventListener('change', updateDisplayWordVisibility);
+
 function generateRandomOrder(words) {
     const uniqueWords = Array.from(new Set(words));
     let randomOrder = [...uniqueWords];
@@ -131,15 +188,4 @@ function shuffleArray(array) {
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
     }
-}
-
-// Function to check if Nepali synthesis is supported
-function isNepaliSynthesisSupported() {
-    return speechSynthesis.getVoices().some(voice => voice.lang === 'ne-NP');
-}
-
-// Function to get words from local storage
-function getWordsFromLocalStorage() {
-    const storedWords = localStorage.getItem('randomizedWords');
-    return storedWords ? JSON.parse(storedWords) : [];
-                      }
+        }
