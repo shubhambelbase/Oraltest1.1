@@ -73,7 +73,12 @@ function startOralTest() {
 
         const currentWord = randomizedWords[currentIndex];
         const utterance = new SpeechSynthesisUtterance(currentWord);
-        utterance.lang = 'ne-NP';
+
+        if (isNepaliWord(currentWord)) {
+            utterance.lang = 'ne-NP';
+        } else if (isKoreanWord(currentWord)) {
+            utterance.lang = 'ko-KR';
+        }
 
         currentUtterance = utterance;
 
@@ -115,7 +120,7 @@ function repeatWord() {
         speechSynthesis.cancel();
 
         const utterance = new SpeechSynthesisUtterance(randomizedWords[currentIndex - 1]);
-        utterance.lang = 'ne-NP';
+        utterance.lang = isNepaliWord(randomizedWords[currentIndex - 1]) ? 'ne-NP' : 'ko-KR';
 
         speechSynthesis.speak(utterance);
     }
@@ -136,7 +141,12 @@ function resetOralTest() {
 
     const currentWord = randomizedWords[currentIndex];
     const utterance = new SpeechSynthesisUtterance(currentWord);
-    utterance.lang = 'ne-NP';
+
+    if (isNepaliWord(currentWord)) {
+        utterance.lang = 'ne-NP';
+    } else if (isKoreanWord(currentWord)) {
+        utterance.lang = 'ko-KR';
+    }
 
     currentUtterance = utterance;
 
@@ -188,4 +198,18 @@ function shuffleArray(array) {
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
     }
-                                                         }
+}
+
+// Function to check if a word is in Nepali
+function isNepaliWord(word) {
+    // Add your logic to determine if the word is in Nepali
+    // For example, you could check if it contains certain characters or patterns
+    // Return true if it's a Nepali word, false otherwise
+}
+
+// Function to check if a word is in Korean
+function isKoreanWord(word) {
+    // Add your logic to determine if the word is in Korean
+    // For example, you could check if it contains certain characters or patterns
+    // Return true if it's a Korean word, false otherwise
+}
